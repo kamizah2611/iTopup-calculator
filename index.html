@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html lang="ms">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>i-Topup Calculator | KWSP Muar</title>
+
+<style>
+body {
+  font-family: Arial, Helvetica, sans-serif;
+  background: #f4f6f8;
+  margin: 0;
+  padding: 0;
+}
+
+.container {
+  max-width: 720px;
+  margin: auto;
+  background: #ffffff;
+  padding: 20px;
+  min-height: 100vh;
+}
+
+.header {
+  text-align: center;
+  margin-bottom: 20px;
+}
+
+.header img {
+  max-height: 70px;
+  margin-bottom: 10px;
+}
+
+.header h2 {
+  color: #006b3f;
+  margin: 5px 0;
+}
+
+.header p {
+  font-size: 13px;
+  color: #555;
+}
+
+label {
+  font-weight: bold;
+  margin-top: 10px;
+  display: block;
+}
+
+input, select {
+  width: 100%;
+  padding: 10px;
+  margin-top: 5px;
+  margin-bottom: 15px;
+  font-size: 16px;
+}
+
+button {
+  width: 100%;
+  background: #006b3f;
+  color: #fff;
+  border: none;
+  padding: 12px;
+  font-size: 16px;
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+button:hover {
+  background: #005530;
+}
+
+.result {
+  background: #f1f9f5;
+  padding: 15px;
+  border-radius: 8px;
+  margin-top: 20px;
+}
+
+.result p {
+  margin: 8px 0;
+}
+
+.footer {
+  text-align: center;
+  font-size: 12px;
+  color: #666;
+  margin-top: 25px;
+}
+</style>
+</head>
+
+<body>
+
+<div class="container">
+
+  <div class="header">
+    <img src="logo_kwsp.png" alt="KWSP">
+    <h2>i-Topup Calculator</h2>
+    <p>Initiative by KWSP Muar</p>
+  </div>
+
+  <label>Umur Ahli</label>
+  <select id="umur">
+    <option value="below60">Kurang 60 Tahun</option>
+    <option value="above60">60 Tahun & Ke Atas</option>
+  </select>
+
+  <label>Gaji Bulanan (Minimum RM1,700)</label>
+  <input type="number" id="gaji" min="1700" value="1700">
+
+  <label>Tambahan i-Topup Pekerja (%)</label>
+  <input type="number" id="topupPekerja" min="0" max="100" value="0">
+
+  <label>Tambahan i-Topup Majikan (%)</label>
+  <input type="number" id="topupMajikan" min="0" max="100" value="0">
+
+  <label>Baki Semasa Akaun KWSP (RM)</label>
+  <input type="number" id="baki" value="0">
+
+  <button onclick="kira()">Kira i-Topup</button>
+
+  <div class="result">
+    <p><b>Caruman Asal (Tanpa i-Topup)</b><br>
+    RM <span id="asal">0.00</span></p>
+
+    <p><b>Jumlah Caruman Selepas i-Topup</b><br>
+    RM <span id="baru">0.00</span></p>
+
+    <p><b>Kenaikan Potongan Pekerja</b><br>
+    RM <span id="naikPekerja">0.00</span></p>
+
+    <p><b>Kenaikan Caruman Majikan</b><br>
+    RM <span id="naikMajikan">0.00</span></p>
+
+    <hr>
+
+    <p><b>Anggaran Simpanan Umur 60 Tahun</b><br>
+    (Anggaran dividen 5%)<br>
+    RM <span id="umur60">0.00</span></p>
+  </div>
+
+  <div class="footer">
+    i-Topup Calculator © KWSP Muar
+  </div>
+
+</div>
+
+<script>
+function kira() {
+
+  let gaji = parseFloat(document.getElementById("gaji").value);
+  if (gaji < 1700) {
+    alert("Gaji minimum yang dibenarkan ialah RM1,700");
+    return;
+  }
+
+  let umur = document.getElementById("umur").value;
+  let topupP = parseFloat(document.getElementById("topupPekerja").value);
+  let topupM = parseFloat(document.getElementById("topupMajikan").value);
+  let baki = parseFloat(document.getElementById("baki").value);
+
+  let pekerjaRate = 0;
+  let majikanRate = 0;
+
+  if (umur === "below60") {
+    pekerjaRate = 11;
+    majikanRate = (gaji < 5000) ? 13 : 12;
+  } else {
+    pekerjaRate = 0;
+    majikanRate = 4;
+  }
+
+  let asalPekerja = gaji * pekerjaRate / 100;
+  let asalMajikan = gaji * majikanRate / 100;
+  let asalJumlah = asalPekerja + asalMajikan;
+
+  let baruPekerja = gaji * (pekerjaRate + topupP) / 100;
+  let baruMajikan = gaji * (majikanRate + topupM) / 100;
+  let baruJumlah = baruPekerja + baruMajikan;
+
+  let naikP = baruPekerja - asalPekerja;
+  let naikM = baruMajikan - asalMajikan;
+
+  document.getElementById("asal").innerText = asalJumlah.toFixed(2);
+  document.getElementById("baru").innerText = baruJumlah.toFixed(2);
+  document.getElementById("naikPekerja").innerText = naikP.toFixed(2);
+  document.getElementById("naikMajikan").innerText = naikM.toFixed(2);
+
+  // Anggaran simpanan (1 tahun contoh, 5% dividen)
+  let anggaran = (baki + (baruJumlah * 12)) * 1.05;
+  document.getElementById("umur60").innerText = anggaran.toFixed(2);
+}
+</script>
+
+</body>
+</html>
